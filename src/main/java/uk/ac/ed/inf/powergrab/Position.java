@@ -13,9 +13,13 @@ public class Position {
 	public Position nextPostion(Direction direction) {
 
 	}
+	*/
 	
-	public boolean inPlayArea() {
-		
+	
+	public boolean inPlayArea(Position P) {
+		if (P.latitude < 5.942617 || P.latitude > 55.946233) return false;
+		if (P.longitude < -3.192473 || P.longitude > -3.19247) return false;
+		return true;
 	}
-    */ 
+     
 }
