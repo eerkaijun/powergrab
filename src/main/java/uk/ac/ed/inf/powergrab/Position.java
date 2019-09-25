@@ -13,14 +13,19 @@ public class Position {
 	}
 	
 	
-	public Position nextPosition() {
+	public Position nextPosition(Direction direction) {
 		
-		Position temp = new Position(latitude, longitude);
 		double x_move, y_move;
-		x_move = 0.0003 * Math.sin(2.5);
-		y_move = 0.0003 * Math.cos(1.5);
+		x_move = 0.0003 * Math.sin(direction.angle);
+		y_move = 0.0003 * Math.cos(direction.angle);
+		Position temp = new Position(latitude, longitude);
 		temp.longitude = temp.longitude + x_move;
-		temp.latitude = temp.latitude + y_move; 
+		temp.latitude = temp.latitude + y_move;
+		// check if the drone is still within the playing area
+		if (temp.inPlayArea() == false) {
+			temp.longitude = temp.longitude - x_move;
+			temp.latitude = temp.latitude - y_move;
+		}
 		return temp;
 	}
 	
