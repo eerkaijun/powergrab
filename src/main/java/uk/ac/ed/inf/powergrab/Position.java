@@ -1,24 +1,33 @@
 package uk.ac.ed.inf.powergrab;
 
+//import java.lang.*;
+
 public class Position {
 	
 	public double latitude;
 	public double longitude;
 	
 	public Position(double latitude, double longitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+	
+	
+	public Position nextPosition() {
 		
+		Position temp = new Position(latitude, longitude);
+		double x_move, y_move;
+		x_move = 0.0003 * Math.sin(2.5);
+		y_move = 0.0003 * Math.cos(1.5);
+		temp.longitude = temp.longitude + x_move;
+		temp.latitude = temp.latitude + y_move; 
+		return temp;
 	}
 	
-	/*
-	public Position nextPostion(Direction direction) {
 
-	}
-	*/
-	
-	
-	public boolean inPlayArea(Position P) {
-		if (P.latitude < 5.942617 || P.latitude > 55.946233) return false;
-		if (P.longitude < -3.192473 || P.longitude > -3.19247) return false;
+	public boolean inPlayArea() {
+		if (this.latitude < 55.942617 || this.latitude > 55.946233) return false;
+		if (this.longitude < -3.192473 || this.longitude > -3.184319) return false;
 		return true;
 	}
      
