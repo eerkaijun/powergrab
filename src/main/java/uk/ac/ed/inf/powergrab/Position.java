@@ -29,8 +29,8 @@ public class Position {
 	
 
 	public boolean inPlayArea() {
-		if (this.latitude < 55.942617 || this.latitude > 55.946233) return false;
-		if (this.longitude < -3.192473 || this.longitude > -3.184319) return false;
+		if (this.latitude <= 55.942617 || this.latitude >= 55.946233) return false;
+		if (this.longitude <= -3.192473 || this.longitude >= -3.184319) return false;
 		return true;
 	}
      
