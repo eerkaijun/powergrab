@@ -1,7 +1,5 @@
 package uk.ac.ed.inf.powergrab;
 
-//import java.lang.*;
-
 public class Position {
 	
 	public double latitude;

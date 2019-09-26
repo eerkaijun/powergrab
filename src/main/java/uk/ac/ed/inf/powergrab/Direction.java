@@ -2,7 +2,8 @@ package uk.ac.ed.inf.powergrab;
 
 public class Direction {
 	
-	public double angle;
+	public final double angle;
+	
 	public static final Direction N = new Direction(0);
 	public static final Direction NNE = new Direction(22.5);
 	public static final Direction NE = new Direction(45);
@@ -21,7 +22,7 @@ public class Direction {
 	public static final Direction NNW = new Direction(337.5);
 	
 	public Direction(double angle) {
-		this.angle = angle;
+		this.angle = Math.toRadians(angle);
 	}
 
 }
