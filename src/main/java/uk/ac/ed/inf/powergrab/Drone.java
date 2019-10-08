@@ -26,4 +26,12 @@ public class Drone extends Position {
 		double b = Math.pow((this.longitude - longitudeIn),2);
 		return (Math.sqrt(a+b));
 	}
+	
+	public boolean withinRange(double distance) {
+		if (distance <= 0.00025) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

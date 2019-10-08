@@ -5,38 +5,26 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Unit test for simple App.
+ * Unit test for PowerGrab App.
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
+public class AppTest extends TestCase {
+	/**
+	 * Create the test case
+	 *
+	 * @param testName name of the test case
+	 */
+	public AppTest(String testName) {
+		super( testName );
+	}
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
+	/**
+	 * @return the suite of tests being tested
+	 */
+	public static Test suite() {
+		return new TestSuite(AppTest.class);
+	}
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
-    
-    public void testPositionConstructor() {
+	public void testPositionConstructor() {
 		assertTrue( new Position(55.944425, -3.188396) != null );
 	}
 
@@ -224,4 +212,5 @@ public class AppTest
 		Position stop = new Position(55.94396264116995,-3.1881340947613324);
 		assertTrue(approxEq(p5, stop));
 	}
+	
 }
