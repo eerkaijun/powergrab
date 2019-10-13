@@ -5,13 +5,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.List;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 
 public class Maps {
 	
 	public String mapString;
+	public String mapSource;
 	
 	public Maps(String mapString) {
 		this.mapString = mapString;
+		this.mapSource = null;
 	}
 	
 	public void readMap() {
@@ -30,13 +35,19 @@ public class Maps {
             while ((line = reader.readLine()) != null) {
                 out.append(line);
             }
-            System.out.println(out.toString());   //Prints the string content read from input stream
+            mapSource = out.toString();
             reader.close();
 	    } catch (MalformedURLException e) {
 	        e.printStackTrace();
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }
+	}
+	
+	public List<Feature> parseMap() {
+		FeatureCollection fc = FeatureCollection.fromJson(mapSource);
+        List<Feature> f = fc.features();
+        return f;
 	}
 
 }
