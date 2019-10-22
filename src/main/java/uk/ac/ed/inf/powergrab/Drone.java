@@ -21,10 +21,15 @@ public class Drone extends Position {
 		if (this.power < 0) this.power = 0;
 	}
 	
-	public boolean withinRange(double latitudeIn, double longitudeIn, double radius){
-		double x = Math.pow((this.longitude - longitudeIn),2);
-		double y = Math.pow((this.latitude - latitudeIn),2);
+	public static double calculateDistance(double latitude, double longitude, double latitudeIn, double longitudeIn) {
+		double x = Math.pow((longitude - longitudeIn),2);
+		double y = Math.pow((latitude - latitudeIn),2);
 		double distance = Math.sqrt(x+y);
+		return distance;
+	}
+	
+	public boolean withinRange(double latitudeIn, double longitudeIn, double radius){
+		double distance = calculateDistance(this.latitude, this.longitude, latitudeIn, longitudeIn);
 		if (distance <= radius) {
 			return true;
 		} else {
