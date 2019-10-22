@@ -1,5 +1,9 @@
 package uk.ac.ed.inf.powergrab;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Direction {
 	
 	public final double angle;
@@ -20,6 +24,9 @@ public class Direction {
 	public static final Direction WNW = new Direction(292.5);
 	public static final Direction NW = new Direction(315);
 	public static final Direction NNW = new Direction(337.5);
+	
+	static Direction[] directions = {N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW};
+	static List<Direction> compass = new ArrayList<Direction>(Arrays.asList(directions));
 	
 	public Direction(double angle) {
 		this.angle = Math.toRadians(angle);
