@@ -8,18 +8,19 @@ import java.net.*;
 import java.util.List;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.Point;
 
 public class Maps {
 	
 	public String mapString;
-	public String mapSource;
 	
 	public Maps(String mapString) {
 		this.mapString = mapString;
-		this.mapSource = null;
 	}
 	
-	public void readMap() {
+	public List<Feature> readMap() {
+		String mapSource = null;
 		try {
 	        URL mapUrl = new URL(mapString);
 	        HttpURLConnection conn = (HttpURLConnection) mapUrl.openConnection();
@@ -42,12 +43,20 @@ public class Maps {
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }
-	}
-	
-	public List<Feature> parseMap() {
+		
 		FeatureCollection fc = FeatureCollection.fromJson(mapSource);
         List<Feature> f = fc.features();
         return f;
+	}
+	
+	public double[] getCoordinates(List<Feature> features, int i) {
+		Feature f = features.get(i);
+		Geometry g = f.geometry();
+        Point p = (Point) g;
+        double longitude = p.coordinates().get(0);
+        double latitude = p.coordinates().get(1);
+        double[] coordinates = {latitude, longitude};
+        return coordinates;
 	}
 
 }
