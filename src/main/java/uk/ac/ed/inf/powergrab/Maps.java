@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.util.List;
+
+import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
@@ -56,6 +58,18 @@ public class Maps {
         double latitude = p.coordinates().get(1);
         double[] coordinates = {latitude, longitude};
         return coordinates;
+	}
+	
+	public double getCoin(Feature f) {
+		JsonElement elm = f.getProperty("coins");
+    	double coinIn = elm.getAsDouble();
+    	return coinIn;
+	}
+	
+	public double getPower(Feature f) {
+		JsonElement elm = f.getProperty("power");
+    	double powerIn = elm.getAsDouble();
+    	return powerIn;
 	}
 
 }
