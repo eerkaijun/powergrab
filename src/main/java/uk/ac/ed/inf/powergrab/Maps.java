@@ -49,8 +49,7 @@ public class Maps {
         return f;
 	}
 	
-	public double[] getCoordinates(List<Feature> features, int i) {
-		Feature f = features.get(i);
+	public double[] getCoordinates(Feature f) {
 		Geometry g = f.geometry();
         Point p = (Point) g;
         double longitude = p.coordinates().get(0);
