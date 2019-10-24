@@ -20,12 +20,6 @@ public class Position {
 		temp.longitude = temp.longitude + x_move;
 		temp.latitude = temp.latitude + y_move;
 		
-		// check if the drone is still within the playing area
-		if (temp.inPlayArea() == false) {
-			temp.longitude = temp.longitude - x_move;
-			temp.latitude = temp.latitude - y_move;
-		}
-		
 		return temp;
 	}
 	
