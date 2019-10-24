@@ -31,7 +31,7 @@ public class Stateless {
 		
 		List<Feature> features_positive = new ArrayList<Feature>(); //List of features with positive coin within area of rough estimation
 		List<Feature> features_valid = new ArrayList<Feature>(); //List of valid features after move by drone
-
+		
 		//Rough estimation on the positive charging stations within the next move of the drone
 		//The stations are stored in the variable features_positive
 		for (int i=0; i<50; i++) {
@@ -48,14 +48,17 @@ public class Stateless {
 		
 		//Initialise a test drone and choose a random direction to move
 		do {
+			features_valid.clear();
 			Drone drone_test = drone;
 			int move = rnd.nextInt(16);
 			drone_test.nextPosition(Direction.compass.get(move));
-			for (int i=0; i<features_positive.size(); i++) {
-				Feature f = features_positive.get(i);
-				double[] coordinates = map.getCoordinates(f);
-				if(drone.withinRange(coordinates[0], coordinates[1], 0.00025)) {
-					features_valid.add(f);
+			if(drone_test.inPlayArea()) {
+				for (int i=0; i<features_positive.size(); i++) {
+					Feature f = features_positive.get(i);
+					double[] coordinates = map.getCoordinates(f);
+					if(drone.withinRange(coordinates[0], coordinates[1], 0.00025)) {
+						features_valid.add(f);
+					}
 				}
 			}
 		
