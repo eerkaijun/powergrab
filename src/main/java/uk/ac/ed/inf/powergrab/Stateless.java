@@ -42,7 +42,8 @@ public class Stateless {
 				if(drone.withinRange(coordinates[0], coordinates[1], 0.00055)){
 					JsonElement elm = f.getProperty("marker-symbol");
 					String symbol = elm.getAsString();
-					if(symbol == "lighthouse") {
+					System.out.println(symbol);
+					if(symbol.equals("lighthouse")) {
 						features_positive.add(f);
 					}	       
 				}
@@ -50,22 +51,27 @@ public class Stateless {
 		
 			//Initialise a test drone and choose a random direction to move
 			do {
+				
 				features_valid.clear();
 				Drone drone_test = drone;
 				int move = rnd.nextInt(16);
-				drone_test.nextPosition(Direction.compass.get(move));
+				System.out.println(move);
+				//TODO: Return object not defined
+				drone_test = drone_test.nextPosition(Direction.compass.get(move));
+				System.out.println(drone_test.latitude);
+				System.out.println(drone_test.longitude);
 				if(drone_test.inPlayArea()) {
 					for (int i=0; i<features_positive.size(); i++) {
 						Feature f = features_positive.get(i);
 						double[] coordinates = map.getCoordinates(f);
-						if(drone.withinRange(coordinates[0], coordinates[1], 0.00025)) {
+						if(drone_test.withinRange(coordinates[0], coordinates[1], 0.00025)) {
 							features_valid.add(f);
 						}
 					}
 				}
 		
 				if(features_valid.size() > 0) {
-					drone.nextPosition(Direction.compass.get(move));
+					drone = drone.nextPosition(Direction.compass.get(move));
 					double[] distance = new double[features_valid.size()];
 					for (int i=0; i<features_valid.size(); i++) {
 						Feature f = features_valid.get(i);
@@ -85,6 +91,11 @@ public class Stateless {
 		
 			drone.updatePower(-1.25);
 			this.moves--;
+			
+			System.out.println(drone.latitude);
+			System.out.println(drone.longitude);
 		}
+		System.out.println(drone.coin);
+		System.out.println(drone.power);
 	}	
 }
