@@ -32,6 +32,7 @@ public class Stateless {
 		while(this.moves>0 && drone.power>0) {
 		
 			List<Feature> features_positive = new ArrayList<Feature>(); //List of features with positive coin within area of rough estimation
+			List<Feature> features_negative = new ArrayList<Feature>(); //List of features with negative coin within area of rough estimation
 			List<Feature> features_valid = new ArrayList<Feature>(); //List of valid features after move by drone
 		
 			//Rough estimation on the positive charging stations within the next move of the drone
@@ -45,57 +46,74 @@ public class Stateless {
 					System.out.println(symbol);
 					if(symbol.equals("lighthouse")) {
 						features_positive.add(f);
+					} else {
+						features_negative.add(f);
 					}	       
 				}
 			}
-		
-			//Initialise a test drone and choose a random direction to move
-			do {
-				
-				features_valid.clear();
-				Drone drone_test = drone;
-				int move = rnd.nextInt(16);
-				System.out.println(move);
-				//TODO: Return object not defined
-				drone_test = drone_test.nextPosition(Direction.compass.get(move));
-				System.out.println(drone_test.latitude);
-				System.out.println(drone_test.longitude);
-				if(drone_test.inPlayArea()) {
-					for (int i=0; i<features_positive.size(); i++) {
-						Feature f = features_positive.get(i);
-						double[] coordinates = map.getCoordinates(f);
-						if(drone_test.withinRange(coordinates[0], coordinates[1], 0.00025)) {
-							features_valid.add(f);
-						}
+			
+			if (features_positive.size() == 0) {
+				int temp = 1;  
+				while(temp == 1) {
+					Drone drone_test = drone;
+					int move = rnd.nextInt(16);
+					System.out.println(move);
+					drone_test = drone_test.nextPosition(Direction.compass.get(move));
+					if(drone_test.inPlayArea()) {
+						drone = drone.nextPosition(Direction.compass.get(move));
+						temp = 0;
 					}
 				}
-		
-				if(features_valid.size() > 0) {
-					drone = drone.nextPosition(Direction.compass.get(move));
-					double[] distance = new double[features_valid.size()];
-					for (int i=0; i<features_valid.size(); i++) {
-						Feature f = features_valid.get(i);
-						double[] coordinates = map.getCoordinates(f);
-						distance[i] = Drone.calculateDistance(drone.latitude, drone.longitude, coordinates[0], coordinates[1]);
+			} else {		
+				//Initialise a test drone and choose a random direction to move
+				do {
+					features_valid.clear();
+					Drone drone_test = drone;
+					int move = rnd.nextInt(16);
+					System.out.println(move);
+					drone_test = drone_test.nextPosition(Direction.compass.get(move));
+					System.out.println(drone_test.latitude);
+					System.out.println(drone_test.longitude);
+					if(drone_test.inPlayArea()) {
+						for (int i=0; i<features_positive.size(); i++) {
+							Feature f = features_positive.get(i);
+							double[] coordinates = map.getCoordinates(f);
+							if(drone_test.withinRange(coordinates[0], coordinates[1], 0.00025)) {
+								features_valid.add(f);
+							}
+						}
+					} else {
+						System.out.println("Drone_test is out of play area");
 					}
-					//Return the feature with the nearest distance
-					int index = Drone.minDist(distance);
-					//Update coin and power
-					Feature f = features_valid.get(index);
-					double coinIn = map.getCoin(f);
-					drone.updateCoin(coinIn);
-					double powerIn = map.getPower(f);
-					drone.updatePower(powerIn);
-				} 
-			} while(features_valid.size() == 0);
 		
-			drone.updatePower(-1.25);
-			this.moves--;
-			
-			System.out.println(drone.latitude);
-			System.out.println(drone.longitude);
+					if(features_valid.size() > 0) {
+						drone = drone.nextPosition(Direction.compass.get(move));
+						double[] distance = new double[features_valid.size()];
+						for (int i=0; i<features_valid.size(); i++) {
+							Feature f = features_valid.get(i);
+							double[] coordinates = map.getCoordinates(f);
+							distance[i] = Drone.calculateDistance(drone.latitude, drone.longitude, coordinates[0], coordinates[1]);
+						}
+						//Return the feature with the nearest distance
+						int index = Drone.minDist(distance);
+						//Update coin and power
+						Feature f = features_valid.get(index);
+						String ID = map.getID(f);
+						double coinIn = map.getCoin(f);
+						drone.updateCoin(coinIn);
+						double powerIn = map.getPower(f);
+						drone.updatePower(powerIn);
+					} 
+				} while(features_valid.size() == 0);
+		
+				drone.updatePower(-1.25);
+				this.moves--;
+				System.out.println("Number of moves: " + this.moves);
+				System.out.println("Coin values after " + this.moves + " is: " + drone.coin);
+				System.out.println("Power values after " + this.moves + " is: " + drone.power);
+				System.out.println("Latitude values after " + this.moves + " is: " + drone.latitude);
+				System.out.println("Longitude values after " + this.moves + " is: " + drone.longitude);
+			}
 		}
-		System.out.println(drone.coin);
-		System.out.println(drone.power);
 	}	
 }
