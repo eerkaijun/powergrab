@@ -71,5 +71,11 @@ public class Maps {
     	double powerIn = elm.getAsDouble();
     	return powerIn;
 	}
+	
+	public String getID(Feature f) {
+		JsonElement elm = f.getProperty("id");
+		String ID = elm.getAsString();
+		return ID;
+	}
 
 }
