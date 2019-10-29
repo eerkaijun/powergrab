@@ -50,32 +50,5 @@ public class Maps {
         List<Feature> f = fc.features();
         return f;
 	}
-	
-	public double[] getCoordinates(Feature f) {
-		Geometry g = f.geometry();
-        Point p = (Point) g;
-        double longitude = p.coordinates().get(0);
-        double latitude = p.coordinates().get(1);
-        double[] coordinates = {latitude, longitude};
-        return coordinates;
-	}
-	
-	public double getCoin(Feature f) {
-		JsonElement elm = f.getProperty("coins");
-    	double coinIn = elm.getAsDouble();
-    	return coinIn;
-	}
-	
-	public double getPower(Feature f) {
-		JsonElement elm = f.getProperty("power");
-    	double powerIn = elm.getAsDouble();
-    	return powerIn;
-	}
-	
-	public String getID(Feature f) {
-		JsonElement elm = f.getProperty("id");
-		String ID = elm.getAsString();
-		return ID;
-	}
 
 }
