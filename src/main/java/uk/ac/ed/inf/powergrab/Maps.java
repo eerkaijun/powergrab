@@ -7,11 +7,8 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.util.List;
 
-import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.Point;
 
 public class Maps {
 	
