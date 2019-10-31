@@ -15,11 +15,11 @@ public class Stateless {
 	public int seed;
 	
 	public Stateless(int seed) {
-		this.moves = 50;
+		this.moves = 250;
 		this.seed = seed;
 	}
 	
-	public void simulation(String url, double latitudeInitial, double longitudeInitial) {
+	public void simulation(String url, String filename, double latitudeInitial, double longitudeInitial) {
 			
 		//Initialise random seed
 		Random rnd = new Random(this.seed);
@@ -46,6 +46,11 @@ public class Stateless {
 		
 		while(this.moves>0 && drone.power>0) {
 			
+			//Drone coordinates in String before move
+			String pre_latitude = Double.toString(drone.latitude);
+			String pre_longitude = Double.toString(drone.longitude);
+			String direction;
+			
 			//Initialise HashMap -- Integer for directions and Station for nearest charging station in that particular direction
 			HashMap<Integer, Station> positive = new HashMap<Integer, Station>(); 
 			HashMap<Integer, Station> neutral = new HashMap<Integer, Station>(); 
@@ -60,11 +65,11 @@ public class Stateless {
 					double[] distance = new double[50];;
 					for (int j=0; j<50; j++) {
 						Station s = stations.get(j);
-						distance[j] = Drone.calculateDistance(drone_test.latitude, drone_test.longitude, s.coordinates[0], s.coordinates[1]);
+						distance[j] = Distance.calculateDistance(drone_test.latitude, drone_test.longitude, s.coordinates[0], s.coordinates[1]);
 					}
 					System.out.println("The distance size is " + distance.length);
-					if (Drone.minDist(distance) <= 0.00025) {
-						int index = Drone.minIndex(distance);
+					if (Distance.minDist(distance) <= 0.00025) {
+						int index = Distance.minIndex(distance);
 						System.out.println("The charging station with the minimum distance is " + index);
 						Station s = stations.get(index);
 						if (s.coins>0 || s.power>0) positive.put(i, s);
@@ -87,6 +92,7 @@ public class Stateless {
 				int select = rnd.nextInt(keys.length);
 				int move = keys[select];
 				drone = drone.nextPosition(Direction.compass.get(move));
+				direction = Direction.directions_str[move]; 
 				Station s = positive.get(move);
 				drone.updateCoin(s.coins);
 				drone.updatePower(s.power);
@@ -108,12 +114,14 @@ public class Stateless {
 				int select = rnd.nextInt(valid.size());
 				int move = valid.get(select);
 				drone = drone.nextPosition(Direction.compass.get(move));
+				direction = Direction.directions_str[move]; 
 			} else if (negative.size() == (16-invalid_directions.size())) {
 				Set<Integer> key_set = negative.keySet();
 				Integer[] keys = key_set.toArray(new Integer[0]);
 				int select = rnd.nextInt(keys.length);
 				int move = keys[select];
 				drone = drone.nextPosition(Direction.compass.get(move));
+				direction = Direction.directions_str[move]; 
 				Station s = negative.get(move);
 				drone.updateCoin(s.coins);
 				drone.updatePower(s.power);
@@ -132,8 +140,10 @@ public class Stateless {
 				int select = rnd.nextInt(valid.size());
 				int move = valid.get(select);
 				drone = drone.nextPosition(Direction.compass.get(move));
+				direction = Direction.directions_str[move]; 
 			}
 			
+			drone.updatePower(-1.25);
 			this.moves--;
 			System.out.println("Total moves left: " + this.moves);
 			System.out.println("Coin values after " + this.moves + " is: " + drone.coin);
@@ -141,6 +151,15 @@ public class Stateless {
 			System.out.println("Latitude values after " + this.moves + " is: " + drone.latitude);
 			System.out.println("Longitude values after " + this.moves + " is: " + drone.longitude);
 			System.out.println(" ");
+			
+			//Drone values after move
+			
+			String post_latitude = Double.toString(drone.latitude);
+			String post_longitude = Double.toString(drone.longitude);
+			String post_coin = Double.toString(drone.coin);
+			String post_power = Double.toString(drone.power);
+			String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
+			File.writeTextFile(filename, content);
 			
 		}
 		

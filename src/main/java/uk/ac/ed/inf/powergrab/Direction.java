@@ -25,6 +25,7 @@ public class Direction {
 	public static final Direction NW = new Direction(315);
 	public static final Direction NNW = new Direction(337.5);
 	
+	static String[] directions_str = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
 	static Direction[] directions = {N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW};
 	static List<Direction> compass = new ArrayList<Direction>(Arrays.asList(directions));
 	
