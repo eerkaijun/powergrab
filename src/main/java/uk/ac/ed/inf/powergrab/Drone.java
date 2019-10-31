@@ -40,16 +40,17 @@ public class Drone extends Position {
 		return distance;
 	}
 	
-	public boolean withinRange(double latitudeIn, double longitudeIn, double radius){
-		double distance = calculateDistance(this.latitude, this.longitude, latitudeIn, longitudeIn);
-		if (distance <= radius) {
-			return true;
-		} else {
-			return false;
+	public static double minDist(double[] array) {
+		double min = array[0];
+		for(int i=0; i<array.length; i++) {
+			if(array[i] < min) {
+				min = array[i];
+		    }
 		}
+		return min;
 	}
 	
-	public static int minDist(double[] array) {
+	public static int minIndex(double[] array) {
 		double min = array[0];
 		int index = 0;
 		for(int i=0; i<array.length; i++) {
