@@ -9,6 +9,9 @@ import java.util.List;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.LineString;
+import com.mapbox.geojson.Point;
 
 public class Maps {
 	
@@ -46,6 +49,14 @@ public class Maps {
 		FeatureCollection fc = FeatureCollection.fromJson(mapSource);
         List<Feature> f = fc.features();
         return f;
+	}
+	
+	public FeatureCollection writeMap(List<Point> points, List<Feature> features) {
+		Geometry g = (Geometry) LineString.fromLngLats(points);
+    	Feature f = Feature.fromGeometry(g);
+    	features.add(f);
+    	FeatureCollection fc = FeatureCollection.fromFeatures(features);
+    	return fc;
 	}
 
 }
