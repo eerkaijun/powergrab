@@ -19,7 +19,7 @@ public class Stateful {
 		this.seed = seed;
 	}
 	
-	public void simulation(String url, double latitudeInitial, double longitudeInitial) {
+	public void simulation(String url, String filename, double latitudeInitial, double longitudeInitial) {
 		
 		//Initialise random seed
 		Random rnd = new Random(this.seed);
@@ -157,7 +157,8 @@ public class Stateful {
 					move = valid_directions.get(select);
 				}
 				
-				drone = drone.nextPosition(Direction.compass.get(move));				
+				drone = drone.nextPosition(Direction.compass.get(move));
+				direction = Direction.directions_str[move]; 
 				
 			} else {
 				
@@ -181,16 +182,17 @@ public class Stateful {
 					}
 				}
 				
+				int move = -1;
 				if (preferred_directions.size() > 0) {
 					int select = rnd.nextInt(preferred_directions.size());
-					int move = preferred_directions.get(select);
-					drone = drone.nextPosition(Direction.compass.get(move));
+					move = preferred_directions.get(select);
 				} else {
 					int select = rnd.nextInt(valid_directions.size());
-					int move = valid_directions.get(select);
-					drone = drone.nextPosition(Direction.compass.get(move));
+					move = valid_directions.get(select);
 				}
 				
+				drone = drone.nextPosition(Direction.compass.get(move));
+				direction = Direction.directions_str[move]; 
 			}
 			
 			double[] distance = new double[50];
@@ -237,11 +239,12 @@ public class Stateful {
 			Point p = Point.fromLngLat(drone.longitude, drone.latitude);
 			points.add(p);
 			
-			//String post_latitude = Double.toString(drone.latitude);
-			//String post_longitude = Double.toString(drone.longitude);
-			//String post_coin = Double.toString(drone.coin);
-			//String post_power = Double.toString(drone.power);
-			//String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
+			String post_latitude = Double.toString(drone.latitude);
+			String post_longitude = Double.toString(drone.longitude);
+			String post_coin = Double.toString(drone.coin);
+			String post_power = Double.toString(drone.power);
+			String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
+			File.writeTextFile(filename, content);
 			
 		}
 		
