@@ -103,14 +103,6 @@ public class Stateful {
 					}
 				}
 				System.out.println("Adjusted angle is " + Math.toDegrees(adjusted_angle));
-				int temp = -1;
-				for (int i=0; i<16; i++) {
-					if (adjusted_angle - Direction.directions_angle[i] < 0) {
-						temp = i;
-						break;
-					}
-				}
-				System.out.println("The value of temp is " + temp);
 		    
 				//Drone move in the direction towards the nearest positive charging station
 				Drone drone_test1 = drone;
@@ -119,6 +111,44 @@ public class Stateful {
 				int preferred_direction = -1;
 				int second_preferred_direction = -1;
 				List<Integer> valid_directions = new ArrayList<Integer>();
+				List<Integer> negative_directions = new ArrayList<Integer>();
+				
+				for (int i=0; i<16; i++) {
+					//Test for valid directions within the next 16 possible moves
+					Drone drone_test = drone;
+					drone_test = drone_test.nextPosition(Direction.compass.get(i));
+					if (drone_test.inPlayArea()) {
+						valid_directions.add(i);
+					}
+					
+					//Check directions which have negative charging stations within the next move
+					double [] distance_neg = new double[negative.size()];
+					for (int j=0; j<negative.size(); j++) {
+						Station s = negative.get(j);
+						distance_neg[j] = Distance.calculateDistance(drone_test.latitude, drone_test.longitude, s.coordinates[0], s.coordinates[1]);
+					}
+					if (Distance.minDist(distance_neg) <= 0.00025) {
+						negative_directions.add(i);
+					}
+				}
+				
+				int temp = -1;
+				
+				for (int i=1; i<17; i++) {
+					if (adjusted_angle - Direction.directions_angle[i] < 0) {
+						if (Math.abs(adjusted_angle - Direction.directions_angle[i]) < adjusted_angle - Direction.directions_angle[i-1]) {
+							preferred_direction = i;
+							second_preferred_direction = i-1;
+						} else {
+							preferred_direction = i-1;
+							second_preferred_direction = i;
+						}
+						break;
+					}
+				}
+				
+				if (preferred_direction == 16) preferred_direction = 0;
+				if (second_preferred_direction == 16) second_preferred_direction = 0;
 				
 				if (temp == -1) {
 					if (Math.abs(adjusted_angle - Math.toRadians(360.0)) < adjusted_angle - Direction.directions_angle[15]) {
@@ -164,12 +194,27 @@ public class Stateful {
 					}
 				}
 				
+				for (int i=0; i<negative_directions.size(); i++) {
+					int temp1 = negative_directions.get(i);
+					if (preferred_direction == temp1) {
+						if (second_preferred_direction == temp1) {
+							int select = rnd.nextInt(valid_directions.size());
+							int move = valid_directions.get(select);
+							preferred_direction = move;
+						} else {
+							preferred_direction = second_preferred_direction;
+						}
+					} 
+				}
+				
 				if (preferred_direction != -1) {
 					drone = drone.nextPosition(Direction.compass.get(preferred_direction));
 				} else if(second_preferred_direction != -1) {
 					drone = drone.nextPosition(Direction.compass.get(second_preferred_direction));
 				} else {
-					//TODO: Move to a random but valid direction
+					int select = rnd.nextInt(valid_directions.size());
+					int move = valid_directions.get(select);
+					drone = drone.nextPosition(Direction.compass.get(move));
 				}
 				
 			} else {
