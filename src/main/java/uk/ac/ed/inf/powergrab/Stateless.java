@@ -69,7 +69,7 @@ public class Stateless {
 				Drone drone_test = drone;
 				drone_test = drone_test.nextPosition(Direction.compass.get(i));
 				if (drone_test.inPlayArea()) {
-					double[] distance = new double[50];;
+					double[] distance = new double[50];
 					for (int j=0; j<50; j++) {
 						Station s = stations.get(j);
 						distance[j] = Distance.calculateDistance(drone_test.latitude, drone_test.longitude, s.coordinates[0], s.coordinates[1]);
