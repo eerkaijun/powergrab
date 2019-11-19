@@ -27,6 +27,7 @@ public class Direction {
 	
 	static String[] directions_str = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
 	static Direction[] directions = {N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW};
+	static double[] directions_angle = {N.angle, NNE.angle, NE.angle, ENE.angle, E.angle, ESE.angle, SE.angle, SSE.angle, S.angle, SSW.angle, SW.angle, WSW.angle, W.angle, WNW.angle, NW.angle, NNW.angle, Math.toRadians(360)};
 	static List<Direction> compass = new ArrayList<Direction>(Arrays.asList(directions));
 	
 	public Direction(double angle) {
