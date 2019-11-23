@@ -9,67 +9,84 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 
-public class Stateful {
+public abstract class Stateful implements Strategy {
 	
-	public int moves;
-	public int seed;
+	protected Drone drone;
+	protected List<Station> stations;
+	protected List<Station> positive; 
+	protected List<Station> negative; 
+	protected List<Integer> valid_directions;
+	protected List<Integer> preferred_directions;
+	protected int first_preferred_direction;
+	protected int second_preferred_direction;
 	
-	public Stateful(int seed) {
-		this.moves = 250;
-		this.seed = seed;
+	public Stateful(double latitudeInitial, double longitudeInitial, String url) {
+		this.drone = new Drone(0.0, 250.0, 250, latitudeInitial, longitudeInitial);
+		initialiseStations(url);
+		
+		this.positive = new ArrayList<Station>(); 
+		this.negative = new ArrayList<Station>(); 
+		this.valid_directions = new ArrayList<Integer>();
+		this.preferred_directions = new ArrayList<Integer>();
 	}
 	
-	public void simulation(String url, String filename, double latitudeInitial, double longitudeInitial) {
+	public void simulation(String filename, String url, int seed) {
 		
 		//Initialise random seed
-		Random rnd = new Random(this.seed);
+		Random rnd = new Random(seed);
 		
 		//Initialise drone
-		Drone drone = new Drone(0.0, 250.0, latitudeInitial, longitudeInitial);
+		//Drone drone = new Drone(0.0, 250.0, 250, latitudeInitial, longitudeInitial);
 		
-		Maps map = new Maps(url);
-		List<Feature> features = map.readMap();
+		//Maps map = new Maps(url);
+		//List<Feature> features = map.readMap();
 		
 		//Initialise a list of charging stations on the map
-		List<Station> stations = new ArrayList<Station>();
+		//List<Station> stations = new ArrayList<Station>();
 		
 		//List of positive, negative and neutral charging stations respectively
-		List<Station> positive = new ArrayList<Station>();
-	    List<Station> negative = new ArrayList<Station>();
+		//List<Station> positive = new ArrayList<Station>();
+	    //List<Station> negative = new ArrayList<Station>();
 		
 		//Initialise a list of Point indicating the drone's flight path
 		List<Point> points = new ArrayList<Point>();
-		Point p0 = Point.fromLngLat(longitudeInitial, latitudeInitial);
+		Point p0 = Point.fromLngLat(this.drone.longitude, this.drone.latitude);
 		points.add(p0);
 		
 		//Convert features into station instances
-		for (int i=0; i<50; i++) {
-			Feature f = features.get(i);
-			Station s = new Station();
-			s.getInfo(f);
-			stations.add(s);
-		}
+		//for (int i=0; i<50; i++) {
+		//	Feature f = features.get(i);
+		//	Station s = new Station();
+		//	s.getInfo(f);
+		//	stations.add(s);
+		//}
+		
 		
 		for (int i=0; i<50; i++) {
 			Station s = stations.get(i);
 			if (s.marker_symbol.equals("lighthouse")) {
-				positive.add(s);
+				this.positive.add(s);
 			} else if (s.marker_symbol.equals("danger")) {
-				negative.add(s);
+				this.negative.add(s);
 			}
 		}
 		
-		while(this.moves>0 && drone.power>0) {
+		while(this.drone.moves>0 && this.drone.power>0) {
+			
+			this.valid_directions.clear();
+			this.preferred_directions.clear();
 			
 			System.out.println("Positive size is now " + positive.size());
 			
 			//Drone coordinates in String before move
-			String pre_latitude = Double.toString(drone.latitude);
-			String pre_longitude = Double.toString(drone.longitude);
+			String pre_latitude = Double.toString(this.drone.latitude);
+			String pre_longitude = Double.toString(this.drone.longitude);
 			String direction;
 			
-			if (positive.size() != 0) {
+			if (this.positive.size() != 0) {
 				
+				double adjusted_angle = angleNearestPositive();
+				/*
 				//Compute distance between drone and all positive stations available
 				double [] distance_pos = new double[positive.size()];
 				for (int i=0; i<positive.size(); i++) {
@@ -103,10 +120,18 @@ public class Stateful {
 					}
 				}
 				System.out.println("Adjusted angle is " + Math.toDegrees(adjusted_angle));
+				*/
 		    
 				//Drone move in the direction towards the nearest positive charging station
-				int preferred_direction = -1;
-				int second_preferred_direction = -1;
+				this.first_preferred_direction = -1;
+				this.second_preferred_direction = -1;
+				
+				
+				determineAvailableMoves();
+				//int preferred_direction = -1;
+				//int second_preferred_direction = -1;
+				
+				/*
 				List<Integer> valid_directions = new ArrayList<Integer>();
 				List<Integer> valid_non_negative_directions = new ArrayList<Integer>();
 				
@@ -125,8 +150,12 @@ public class Stateful {
 							valid_non_negative_directions.add(i);
 						}
 					}
-				}
+				}*/
 				
+			
+				
+				determinePreferredDirection(adjusted_angle);
+				/*
 				for (int i=1; i<17; i++) {
 					if (adjusted_angle - Direction.directions_angle[i] < 0) {
 						if (Math.abs(adjusted_angle - Direction.directions_angle[i]) < adjusted_angle - Direction.directions_angle[i-1]) {
@@ -141,8 +170,10 @@ public class Stateful {
 				}
 				
 				if (preferred_direction == 16) preferred_direction = 0;
-				if (second_preferred_direction == 16) second_preferred_direction = 0;
-				int move = -1;
+				if (second_preferred_direction == 16) second_preferred_direction = 0;*/
+				direction = meaningfulMoves(rnd);
+				
+				/*
 				if (valid_non_negative_directions.size() > 0) {
 					if (valid_non_negative_directions.contains(preferred_direction)) {
 						move = preferred_direction;
@@ -155,17 +186,18 @@ public class Stateful {
 				} else {
 					int select = rnd.nextInt(valid_directions.size());
 					move = valid_directions.get(select);
-				}
+				}*/
 				
-				drone = drone.nextPosition(Direction.compass.get(move));
-				direction = Direction.directions_str[move]; 
+				//drone = drone.nextPosition(Direction.compass.get(move));
+				//direction = Direction.directions_str[move]; 
 				
 			} else {
 				
 				//Initialise ArrayLists to store preferred directions and valid directions to move
-				List<Integer> preferred_directions = new ArrayList<Integer>();
-				List<Integer> valid_directions = new ArrayList<Integer>();
+				//List<Integer> preferred_directions = new ArrayList<Integer>();
+				//List<Integer> valid_directions = new ArrayList<Integer>();
 				
+				/*
 				for (int i=0; i<16; i++) {
 					Drone drone_test = drone;
 					drone_test = drone_test.nextPosition(Direction.compass.get(i));
@@ -180,8 +212,12 @@ public class Stateful {
 						}
 						valid_directions.add(i);
 					}
-				}
+				}*/
 				
+				determineAvailableMoves();
+				
+				direction = randomMoves(rnd);
+				/*
 				int move = -1;
 				if (preferred_directions.size() > 0) {
 					int select = rnd.nextInt(preferred_directions.size());
@@ -192,9 +228,11 @@ public class Stateful {
 				}
 				
 				drone = drone.nextPosition(Direction.compass.get(move));
-				direction = Direction.directions_str[move]; 
+				direction = Direction.directions_str[move]; */
 			}
 			
+			connectToChargingStation();
+			/*
 			double[] distance = new double[50];
 			for (int i=0; i<50; i++) {
 				Station s = stations.get(i);
@@ -224,33 +262,62 @@ public class Stateful {
 						break;
 					}
 				}
-			} 
+			} */
 			
-			drone.updatePower(-1.25);
-			this.moves--;
-			System.out.println("Total moves left: " + this.moves);
-			System.out.println("Coin values after " + this.moves + " is: " + drone.coin);
-			System.out.println("Power values after " + this.moves + " is: " + drone.power);
-			System.out.println("Latitude values after " + this.moves + " is: " + drone.latitude);
-			System.out.println("Longitude values after " + this.moves + " is: " + drone.longitude);
+			this.drone.updatePower(-1.25);
+			this.drone.moves--;
+			System.out.println("Total moves left: " + this.drone.moves);
+			System.out.println("Coin values after " + this.drone.moves + " is: " + this.drone.coin);
+			System.out.println("Power values after " + this.drone.moves + " is: " + this.drone.power);
+			System.out.println("Latitude values after " + this.drone.moves + " is: " + this.drone.latitude);
+			System.out.println("Longitude values after " + this.drone.moves + " is: " + this.drone.longitude);
 			System.out.println(" ");
 			
 			
-			Point p = Point.fromLngLat(drone.longitude, drone.latitude);
+			Point p = Point.fromLngLat(this.drone.longitude, this.drone.latitude);
 			points.add(p);
 			
-			String post_latitude = Double.toString(drone.latitude);
-			String post_longitude = Double.toString(drone.longitude);
-			String post_coin = Double.toString(drone.coin);
-			String post_power = Double.toString(drone.power);
+			String post_latitude = Double.toString(this.drone.latitude);
+			String post_longitude = Double.toString(this.drone.longitude);
+			String post_coin = Double.toString(this.drone.coin);
+			String post_power = Double.toString(this.drone.power);
 			String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
 			File.writeTextFile(filename, content);
 			
 		}
 		
+		Maps map = new Maps(url);
+		List<Feature> features = map.readMap();
 		FeatureCollection fc = map.writeMap(points, features);
-		File.writeGeoJSONFile("testing.geojson", fc);
+		File.writeGeoJSONFile("testing1.geojson", fc);
 		
 	}
+	
+	private void initialiseStations(String url) {
+		
+		Maps map = new Maps(url);
+		List<Feature> features = map.readMap();
+		this.stations = new ArrayList<Station>();
+		for (int i=0; i<50; i++) {
+			Feature f = features.get(i);
+			Station s = new Station();
+			s.getInfo(f);
+			this.stations.add(s);
+		}
+		
+	}
+	
+	abstract double angleNearestPositive();
+	
+	abstract void determineAvailableMoves();
+	
+	abstract void determinePreferredDirection(double adjusted_angle);
+	
+	abstract String meaningfulMoves(Random rnd);
+	
+	abstract String randomMoves(Random rnd);
+	
+	abstract void connectToChargingStation();
+
 
 }
