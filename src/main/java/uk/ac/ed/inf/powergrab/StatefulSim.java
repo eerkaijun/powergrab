@@ -9,6 +9,7 @@ public class StatefulSim extends Stateful{
 	}
 	
 	public double angleNearestPositive() {
+		
 		double [] distance_pos = new double[this.positive.size()];
 		for (int i=0; i<this.positive.size(); i++) {
 			Station s = this.positive.get(i);
@@ -42,9 +43,11 @@ public class StatefulSim extends Stateful{
 		}
 		System.out.println("Adjusted angle is " + Math.toDegrees(adjusted_angle));
 		return adjusted_angle;
+		
 	}
 	
 	public void determineAvailableMoves() {
+		
 		for (int i=0; i<16; i++) {
 			//Test for valid directions within the next 16 possible moves
 			Drone drone_test = this.drone;
@@ -61,9 +64,11 @@ public class StatefulSim extends Stateful{
 				}
 			}
 		}
+		
 	}
 	
 	public void determinePreferredDirection(double adjusted_angle) {
+		
 		for (int i=1; i<17; i++) {
 			if (adjusted_angle - Direction.directions_angle[i] < 0) {
 				if (Math.abs(adjusted_angle - Direction.directions_angle[i]) < adjusted_angle - Direction.directions_angle[i-1]) {
@@ -79,9 +84,11 @@ public class StatefulSim extends Stateful{
 		
 		if (this.first_preferred_direction == 16) this.first_preferred_direction = 0;
 		if (this.second_preferred_direction == 16) this.second_preferred_direction = 0;
+		
 	}
 	
 	public String meaningfulMoves(Random rnd) {
+		
 		String direction;
 		int move;
 		if (this.preferred_directions.size() > 0) {
@@ -100,9 +107,11 @@ public class StatefulSim extends Stateful{
 		this.drone = this.drone.nextPosition(Direction.compass.get(move));
 		direction = Direction.directions_str[move]; 
 		return direction;
+		
 	}
 	
 	public String randomMoves(Random rnd) {
+		
 		String direction;
 		int move;
 		if (this.preferred_directions.size() > 0) {
@@ -115,9 +124,11 @@ public class StatefulSim extends Stateful{
 		this.drone = this.drone.nextPosition(Direction.compass.get(move));
 		direction = Direction.directions_str[move]; 
 		return direction;
+		
 	}
 	
 	public void connectToChargingStation() {
+		
 		double[] distance = new double[50];
 		for (int i=0; i<50; i++) {
 			Station s = this.stations.get(i);
@@ -148,6 +159,7 @@ public class StatefulSim extends Stateful{
 				}
 			}
 		} 
+	    
 	}
 
 }

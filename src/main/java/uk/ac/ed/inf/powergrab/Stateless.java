@@ -21,17 +21,6 @@ public abstract class Stateless implements Strategy{
 	public Stateless(double latitudeInitial, double longitudeInitial, String url) {
 		this.drone = new Drone(0.0, 250.0, 250, latitudeInitial, longitudeInitial);
 		initialiseStations(url);
-		/*
-		Maps map = new Maps(url);
-		List<Feature> features = map.readMap();
-		this.stations = new ArrayList<Station>();
-		for (int i=0; i<50; i++) {
-			Feature f = features.get(i);
-			Station s = new Station();
-			s.getInfo(f);
-			this.stations.add(s);
-		}*/
-		
 		this.positive = new HashMap<Integer, Station>(); 
 		this.neutral = new HashMap<Integer, Station>(); 
 		this.negative = new HashMap<Integer, Station>(); 
@@ -43,31 +32,10 @@ public abstract class Stateless implements Strategy{
 		//Initialise random seed
 		Random rnd = new Random(seed);
 		
-		//Initialise a stateless drone
-		//Drone drone = new Drone(0.0, 250.0, latitudeInitial, longitudeInitial);
-		//System.out.println(drone.latitude);
-		//System.out.println(drone.longitude);
-		
-		//Initialise the map based on the given URL
-		//Maps map = new Maps(url);
-		//List<Feature> features = map.readMap();
-		
-		//Initialise a list of charging stations on the map
-		//List<Station> stations = new ArrayList<Station>();
-		
 		//Initialise a list of Point indicating the drone's flight path
 		List<Point> points = new ArrayList<Point>();
 		Point p0 = Point.fromLngLat(this.drone.longitude, this.drone.latitude);
 		points.add(p0);
-		
-		//Convert features into station instances
-		/*
-		for (int i=0; i<50; i++) {
-			Feature f = features.get(i);
-			Station s = new Station();
-			s.getInfo(f);
-			stations.add(s);
-		}*/
 		
 		while(this.drone.moves>0 && this.drone.power>0) {
 			
@@ -75,12 +43,6 @@ public abstract class Stateless implements Strategy{
 			String pre_latitude = Double.toString(this.drone.latitude);
 			String pre_longitude = Double.toString(this.drone.longitude);
 			String direction;
-			
-			//Initialise HashMap -- Integer for directions and Station for nearest charging station in that particular direction
-			//HashMap<Integer, Station> positive = new HashMap<Integer, Station>(); 
-			//HashMap<Integer, Station> neutral = new HashMap<Integer, Station>(); 
-			//HashMap<Integer, Station> negative = new HashMap<Integer, Station>(); 
-			//List<Integer> invalid_directions = new ArrayList<Integer>();
 			
 			this.positive.clear();
 			this.neutral.clear();
