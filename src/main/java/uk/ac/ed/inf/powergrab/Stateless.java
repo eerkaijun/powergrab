@@ -18,7 +18,7 @@ public abstract class Stateless implements Strategy{
 	protected HashMap<Integer, Station> negative; 
 	protected List<Integer> invalid_directions;
 	
-	public Stateless(double latitudeInitial, double longitudeInitial, String url) {
+	public Stateless(double latitudeInitial, double longitudeInitial) {
 		this.drone = new Drone(0.0, 250.0, 250, latitudeInitial, longitudeInitial);
 		this.stations = new ArrayList<Station>();
 		this.positive = new HashMap<Integer, Station>(); 
@@ -74,7 +74,7 @@ public abstract class Stateless implements Strategy{
 			
 			//Update the power and move values of the drone
 			this.drone.updatePower(-1.25);
-			this.drone.moves = this.drone.moves--;
+			this.drone.moves--;
 			
 			Point p = Point.fromLngLat(drone.longitude, drone.latitude);
 			points.add(p);
@@ -84,7 +84,7 @@ public abstract class Stateless implements Strategy{
 			String post_coin = Double.toString(drone.coin);
 			String post_power = Double.toString(drone.power);
 			String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
-			File.writeTextFile(filename, content);
+			File.writeTextFile(filename+".txt", content);
 			
 			//Debugging statement
 			System.out.println("Total moves left: " + this.drone.moves);
@@ -98,7 +98,7 @@ public abstract class Stateless implements Strategy{
 		
 		//Write the drone's path to a new GeoJSON file 
 		FeatureCollection fc = map.writeMap(points, features);
-		File.writeGeoJSONFile("test.geojson", fc);
+		File.writeGeoJSONFile(filename+".geojson", fc);
 		
 	}
 	

@@ -8,8 +8,8 @@ import java.util.Set;
 
 public class StatelessSim extends Stateless{
 	
-	public StatelessSim(double latitude, double longitude, String url) {
-		super(latitude, longitude, url);
+	public StatelessSim(double latitude, double longitude) {
+		super(latitude, longitude);
 	}
 	
 	protected void checkNextPossibleMove() {

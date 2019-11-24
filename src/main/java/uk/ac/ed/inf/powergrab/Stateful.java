@@ -119,7 +119,7 @@ public abstract class Stateful implements Strategy {
 			String post_coin = Double.toString(this.drone.coin);
 			String post_power = Double.toString(this.drone.power);
 			String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
-			File.writeTextFile(filename, content);
+			File.writeTextFile(filename+".txt", content);
 			
 			//Debugging statement
 			System.out.println("Total moves left: " + this.drone.moves);
@@ -133,7 +133,7 @@ public abstract class Stateful implements Strategy {
 		
 		//Write the drone's path to a new GeoJSON file 
 		FeatureCollection fc = map.writeMap(points, features);
-		File.writeGeoJSONFile("testing1.geojson", fc);
+		File.writeGeoJSONFile(filename+".geojson", fc);
 		
 	}
 	
