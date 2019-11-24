@@ -1,5 +1,8 @@
 package uk.ac.ed.inf.powergrab;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
@@ -13,9 +16,7 @@ public class Station {
 	public String marker_symbol;
 	public double[] coordinates;
 	
-	
-	public void getInfo(Feature f) {
-		
+	private void getInfo(Feature f) {
 		JsonElement elm1 = f.getProperty("id");
 		String id = elm1.getAsString();
 		this.id = id;
@@ -38,7 +39,17 @@ public class Station {
         double latitude = p.coordinates().get(1);
         double[] coordinates = {latitude, longitude};
         this.coordinates = coordinates;
-        
+	}
+	
+	public static List<Station> initialiseStations(List<Feature> features) {
+		List<Station> stations = new ArrayList<Station>();
+		for (int i=0; i<features.size(); i++) {
+			Feature f = features.get(i);
+			Station s = new Station();
+			s.getInfo(f);
+			stations.add(s);
+		}
+		return stations;
 	}
 
 }
