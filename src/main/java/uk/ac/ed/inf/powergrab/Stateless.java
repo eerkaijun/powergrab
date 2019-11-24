@@ -20,7 +20,7 @@ public abstract class Stateless implements Strategy{
 	
 	public Stateless(double latitudeInitial, double longitudeInitial, String url) {
 		this.drone = new Drone(0.0, 250.0, 250, latitudeInitial, longitudeInitial);
-		initialiseStations(url);
+		this.stations = new ArrayList<Station>();
 		this.positive = new HashMap<Integer, Station>(); 
 		this.neutral = new HashMap<Integer, Station>(); 
 		this.negative = new HashMap<Integer, Station>(); 
@@ -32,10 +32,17 @@ public abstract class Stateless implements Strategy{
 		//Initialise random seed
 		Random rnd = new Random(seed);
 		
+		//Initialise a list of Features representing charging stations on the map
+		Maps map = new Maps(url);
+		List<Feature> features = map.readMap();
+		
 		//Initialise a list of Point indicating the drone's flight path
 		List<Point> points = new ArrayList<Point>();
 		Point p0 = Point.fromLngLat(this.drone.longitude, this.drone.latitude);
 		points.add(p0);
+		
+		//Initialise the stations list which contains all the charging stations as Station instances
+		this.stations = Station.initialiseStations(features);
 		
 		while(this.drone.moves>0 && this.drone.power>0) {
 			
@@ -65,16 +72,9 @@ public abstract class Stateless implements Strategy{
 				direction = moveRandomly(rnd);
 			}
 			
+			//Update the power and move values of the drone
 			this.drone.updatePower(-1.25);
-			this.drone.moves = this.drone.moves - 1;
-			System.out.println("Total moves left: " + this.drone.moves);
-			System.out.println("Coin values after " + this.drone.moves + " is: " + this.drone.coin);
-			System.out.println("Power values after " + this.drone.moves + " is: " + this.drone.power);
-			System.out.println("Latitude values after " + this.drone.moves + " is: " + this.drone.latitude);
-			System.out.println("Longitude values after " + this.drone.moves + " is: " + this.drone.longitude);
-			System.out.println(" ");
-			
-			//Drone values after move
+			this.drone.moves = this.drone.moves--;
 			
 			Point p = Point.fromLngLat(drone.longitude, drone.latitude);
 			points.add(p);
@@ -86,30 +86,19 @@ public abstract class Stateless implements Strategy{
 			String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
 			File.writeTextFile(filename, content);
 			
+			//Debugging statement
+			System.out.println("Total moves left: " + this.drone.moves);
+			System.out.println("Coin values after " + this.drone.moves + " is: " + this.drone.coin);
+			System.out.println("Power values after " + this.drone.moves + " is: " + this.drone.power);
+			System.out.println("Latitude values after " + this.drone.moves + " is: " + this.drone.latitude);
+			System.out.println("Longitude values after " + this.drone.moves + " is: " + this.drone.longitude);
+			System.out.println(" ");
+			
 		}
 		
-		Maps map = new Maps(url);
-		List<Feature> features = map.readMap();
+		//Write the drone's path to a new GeoJSON file 
 		FeatureCollection fc = map.writeMap(points, features);
 		File.writeGeoJSONFile("test.geojson", fc);
-		
-		for (int i=0; i<50; i++) {
-			System.out.println(i + " station has coin value of " + this.stations.get(i).coins);
-		}
-		
-	}
-	
-	private void initialiseStations(String url) {
-		
-		Maps map = new Maps(url);
-		List<Feature> features = map.readMap();
-		this.stations = new ArrayList<Station>();
-		for (int i=0; i<50; i++) {
-			Feature f = features.get(i);
-			Station s = new Station();
-			s.getInfo(f);
-			this.stations.add(s);
-		}
 		
 	}
 	

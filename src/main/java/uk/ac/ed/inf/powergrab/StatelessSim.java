@@ -13,9 +13,7 @@ public class StatelessSim extends Stateless{
 	}
 	
 	protected void checkNextPossibleMove() {
-		
 		for (int i=0; i<16; i++) {
-			System.out.println("The drone is now in direction " + i);
 			Drone drone_test = this.drone;
 			drone_test = drone_test.nextPosition(Direction.compass.get(i));
 			if (drone_test.inPlayArea()) {
@@ -24,7 +22,6 @@ public class StatelessSim extends Stateless{
 					Station s = this.stations.get(j);
 					distance[j] = Distance.calculateDistance(drone_test.latitude, drone_test.longitude, s.coordinates[0], s.coordinates[1]);
 				}
-				System.out.println("The distance size is " + distance.length);
 				if (Distance.minDist(distance) <= 0.00025) {
 					int index = Distance.minIndex(distance);
 					System.out.println("The charging station with the minimum distance is " + index);
@@ -34,15 +31,12 @@ public class StatelessSim extends Stateless{
 					else this.neutral.put(i, s);
 				} 
 			} else {
-				System.out.println("Drone_test in the direction of " + i + " is out of playing area.");
 				this.invalid_directions.add(i);
 			}
 		}
-		
 	}
 	
 	protected String moveTowardsPositive(Random rnd) {
-		
 		Set<Integer> key_set = this.positive.keySet();
 		Integer[] keys = key_set.toArray(new Integer[0]);
 		int select = rnd.nextInt(keys.length);
@@ -64,7 +58,6 @@ public class StatelessSim extends Stateless{
 	}
 	
 	protected String moveAwayFromNegative(Random rnd) {
-		
 		Set<Integer> key_set = this.negative.keySet();
 		List<Integer> key_list = new ArrayList<Integer>(key_set);
 		Integer[] directions = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
@@ -76,11 +69,9 @@ public class StatelessSim extends Stateless{
 		this.drone = this.drone.nextPosition(Direction.compass.get(move));
 		String direction = Direction.directions_str[move]; 
 		return direction;
-		
 	}
 	
 	protected String moveLeastNegative(Random rnd) {
-		
 		Set<Integer> key_set = this.negative.keySet();
 		Integer[] keys = key_set.toArray(new Integer[0]);
 		int select = rnd.nextInt(keys.length);
@@ -99,11 +90,9 @@ public class StatelessSim extends Stateless{
 			}
 		}
 		return direction;
-		
 	}
 	
 	protected String moveRandomly(Random rnd) {
-		
 		Integer[] directions = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 		List<Integer> valid = new ArrayList<Integer>(Arrays.asList(directions));
 		valid.removeAll(this.invalid_directions);
@@ -112,7 +101,6 @@ public class StatelessSim extends Stateless{
 		this.drone = this.drone.nextPosition(Direction.compass.get(move));
 		String direction = Direction.directions_str[move]; 
 		return direction;
-		
 	}
 
 }
