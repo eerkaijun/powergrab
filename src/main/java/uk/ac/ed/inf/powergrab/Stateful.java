@@ -19,10 +19,9 @@ public abstract class Stateful implements Strategy {
 	protected int first_preferred_direction;
 	protected int second_preferred_direction;
 	
-	public Stateful(double latitudeInitial, double longitudeInitial, String url) {
+	public Stateful(double latitudeInitial, double longitudeInitial) {
 		this.drone = new Drone(0.0, 250.0, 250, latitudeInitial, longitudeInitial);
-		initialiseStations(url);
-		
+		this.stations = new ArrayList<Station>();
 		this.positive = new ArrayList<Station>(); 
 		this.negative = new ArrayList<Station>(); 
 		this.valid_directions = new ArrayList<Integer>();
@@ -34,11 +33,20 @@ public abstract class Stateful implements Strategy {
 		//Initialise random seed
 		Random rnd = new Random(seed);
 		
+		//Initialise a list of Features representing charging stations on the map
+		Maps map = new Maps(url);
+		List<Feature> features = map.readMap();
+		
 		//Initialise a list of Point indicating the drone's flight path
 		List<Point> points = new ArrayList<Point>();
 		Point p0 = Point.fromLngLat(this.drone.longitude, this.drone.latitude);
 		points.add(p0);
 		
+		//Initialise the stations list which contains all the charging stations as Station instances
+		this.stations = Station.initialiseStations(features);
+		
+		//Put the positive charging stations into the positive arraylist
+		//Put the negative charging stations into the negative arraylist
 		for (int i=0; i<50; i++) {
 			Station s = stations.get(i);
 			if (s.marker_symbol.equals("lighthouse")) {
@@ -47,6 +55,8 @@ public abstract class Stateful implements Strategy {
 				this.negative.add(s);
 			}
 		}
+		
+		int count = 0;
 		
 		while(this.drone.moves>0 && this.drone.power>0) {
 			
@@ -81,16 +91,25 @@ public abstract class Stateful implements Strategy {
 				
 			}
 			
-			connectToChargingStation();
+			count = connectToChargingStation(count);
+
+			//If drone is stuck on a nearest positive charging station for more than 30 moves, ignore that station
+			if (count == 30) {
+				if (this.positive.size() > 0) {
+					double [] distance_pos = new double[this.positive.size()];
+					for (int i=0; i<this.positive.size(); i++) {
+						Station s = this.positive.get(i);
+						distance_pos[i] = Distance.calculateDistance(this.drone.latitude, this.drone.longitude, s.coordinates[0], s.coordinates[1]);	
+					}
+					int index_min = Distance.minIndex(distance_pos);
+					this.positive.remove(index_min);
+					count = 0;
+				} 
+			}
 			
+			//Update the power and move values of the drone
 			this.drone.updatePower(-1.25);
 			this.drone.moves--;
-			System.out.println("Total moves left: " + this.drone.moves);
-			System.out.println("Coin values after " + this.drone.moves + " is: " + this.drone.coin);
-			System.out.println("Power values after " + this.drone.moves + " is: " + this.drone.power);
-			System.out.println("Latitude values after " + this.drone.moves + " is: " + this.drone.latitude);
-			System.out.println("Longitude values after " + this.drone.moves + " is: " + this.drone.longitude);
-			System.out.println(" ");
 			
 			Point p = Point.fromLngLat(this.drone.longitude, this.drone.latitude);
 			points.add(p);
@@ -102,28 +121,22 @@ public abstract class Stateful implements Strategy {
 			String content = pre_latitude + "," + pre_longitude + "," + direction + "," + post_latitude + "," + post_longitude + "," + post_coin + "," + post_power;
 			File.writeTextFile(filename, content);
 			
+			//Debugging statement
+			System.out.println("Total moves left: " + this.drone.moves);
+			System.out.println("Coin values after is: " + this.drone.coin);
+			System.out.println("Power values after is: " + this.drone.power);
+			System.out.println("Latitude values after is: " + this.drone.latitude);
+			System.out.println("Longitude values after is: " + this.drone.longitude);
+			System.out.println(" ");
+			
 		}
 		
-		Maps map = new Maps(url);
-		List<Feature> features = map.readMap();
+		//Write the drone's path to a new GeoJSON file 
 		FeatureCollection fc = map.writeMap(points, features);
 		File.writeGeoJSONFile("testing1.geojson", fc);
 		
 	}
 	
-	private void initialiseStations(String url) {
-		
-		Maps map = new Maps(url);
-		List<Feature> features = map.readMap();
-		this.stations = new ArrayList<Station>();
-		for (int i=0; i<50; i++) {
-			Feature f = features.get(i);
-			Station s = new Station();
-			s.getInfo(f);
-			this.stations.add(s);
-		}
-		
-	}
 	
 	abstract double angleNearestPositive();
 	
@@ -135,7 +148,7 @@ public abstract class Stateful implements Strategy {
 	
 	abstract String randomMoves(Random rnd);
 	
-	abstract void connectToChargingStation();
+	abstract int connectToChargingStation(int count);
 
 
 }

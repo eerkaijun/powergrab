@@ -4,29 +4,21 @@ import java.util.Random;
 
 public class StatefulSim extends Stateful{
 	
-	public StatefulSim(double latitude, double longitude, String url) {
-		super(latitude, longitude, url);
+	public StatefulSim(double latitude, double longitude) {
+		super(latitude, longitude);
 	}
 	
 	public double angleNearestPositive() {
-		
 		double [] distance_pos = new double[this.positive.size()];
 		for (int i=0; i<this.positive.size(); i++) {
 			Station s = this.positive.get(i);
 			distance_pos[i] = Distance.calculateDistance(this.drone.latitude, this.drone.longitude, s.coordinates[0], s.coordinates[1]);	
 		}
-		
-		//Debugging statement
-		for (int j=0; j<distance_pos.length; j++) {
-			System.out.println("Number " + j + "is " + distance_pos[j]);
-		}
-		
-		//Move towards the direction of the nearest positive charging station
+		//Find the angle between current position and nearest positive charging station
 		int index_pos = Distance.minIndex(distance_pos);
 		Station s_pos = this.positive.get(index_pos);
 		System.out.println("The nearest positive charging station is " + s_pos.id);
 		double angle = Math.atan((this.drone.longitude-s_pos.coordinates[1])/(this.drone.latitude-s_pos.coordinates[0]));
-		System.out.println("Angle is " + Math.toDegrees(angle));
 		double adjusted_angle;
 		if(drone.longitude > s_pos.coordinates[1]) {
 			if (angle <= 0) {
@@ -43,11 +35,9 @@ public class StatefulSim extends Stateful{
 		}
 		System.out.println("Adjusted angle is " + Math.toDegrees(adjusted_angle));
 		return adjusted_angle;
-		
 	}
 	
 	public void determineAvailableMoves() {
-		
 		for (int i=0; i<16; i++) {
 			//Test for valid directions within the next 16 possible moves
 			Drone drone_test = this.drone;
@@ -59,16 +49,15 @@ public class StatefulSim extends Stateful{
 					Station s = negative.get(j);
 					distance_neg[j] = Distance.calculateDistance(drone_test.latitude, drone_test.longitude, s.coordinates[0], s.coordinates[1]);
 				}
+				//Test for valid directions without negative charging station within the next 16 possible moves
 				if (Distance.minDist(distance_neg) > 0.00025) {
 					this.preferred_directions.add(i);
 				}
 			}
 		}
-		
 	}
 	
 	public void determinePreferredDirection(double adjusted_angle) {
-		
 		for (int i=1; i<17; i++) {
 			if (adjusted_angle - Direction.directions_angle[i] < 0) {
 				if (Math.abs(adjusted_angle - Direction.directions_angle[i]) < adjusted_angle - Direction.directions_angle[i-1]) {
@@ -81,14 +70,13 @@ public class StatefulSim extends Stateful{
 				break;
 			}
 		}
-		
 		if (this.first_preferred_direction == 16) this.first_preferred_direction = 0;
 		if (this.second_preferred_direction == 16) this.second_preferred_direction = 0;
-		
 	}
 	
 	public String meaningfulMoves(Random rnd) {
-		
+		//Move towards the preferred directions if there are no negative charging stations
+		//Else choose a random direction that avoids negative charging stations
 		String direction;
 		int move;
 		if (this.preferred_directions.size() > 0) {
@@ -107,11 +95,10 @@ public class StatefulSim extends Stateful{
 		this.drone = this.drone.nextPosition(Direction.compass.get(move));
 		direction = Direction.directions_str[move]; 
 		return direction;
-		
 	}
 	
 	public String randomMoves(Random rnd) {
-		
+		//Move towards a random direction that avoids negative charging stations
 		String direction;
 		int move;
 		if (this.preferred_directions.size() > 0) {
@@ -124,17 +111,15 @@ public class StatefulSim extends Stateful{
 		this.drone = this.drone.nextPosition(Direction.compass.get(move));
 		direction = Direction.directions_str[move]; 
 		return direction;
-		
 	}
 	
-	public void connectToChargingStation() {
-		
+	public int connectToChargingStation(int count) {
+		count++;
 		double[] distance = new double[50];
 		for (int i=0; i<50; i++) {
 			Station s = this.stations.get(i);
 			distance[i] = Distance.calculateDistance(this.drone.latitude, this.drone.longitude, s.coordinates[0], s.coordinates[1]);
 	    }
-
 	    if (Distance.minDist(distance) <= 0.00025) {
 	    	System.out.println("A charging station is within range!");
 			int index = Distance.minIndex(distance);
@@ -148,6 +133,7 @@ public class StatefulSim extends Stateful{
 				Station s_pos = this.positive.get(i);
 				if (s.id.equals(s_pos.id)) {
 					this.positive.remove(i);
+					count = 0;
 					break;
 				}
 			}
@@ -159,7 +145,6 @@ public class StatefulSim extends Stateful{
 				}
 			}
 		} 
-	    
+	    return count;
 	}
-
 }
