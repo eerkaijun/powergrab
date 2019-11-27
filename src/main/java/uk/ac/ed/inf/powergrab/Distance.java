@@ -2,6 +2,7 @@ package uk.ac.ed.inf.powergrab;
 
 public class Distance {
 	
+	//Calculate the distance between two sets of coordinates
 	public static double calculateDistance(double latitude, double longitude, double latitudeIn, double longitudeIn) {
 		double x = Math.pow((longitude - longitudeIn),2);
 		double y = Math.pow((latitude - latitudeIn),2);
@@ -19,7 +20,6 @@ public class Distance {
 		}
 		return min;
 	}
-	
 	
 	//Return the index of the minimum distance
 	public static int minIndex(double[] array) {
