@@ -15,7 +15,7 @@ import com.mapbox.geojson.Point;
 
 public class Maps {
 	
-	public String mapString;
+	public String mapString; //URL of the map stored in the remote server
 	
 	public Maps(String mapString) {
 		this.mapString = mapString;
@@ -24,7 +24,7 @@ public class Maps {
 	public List<Feature> readMap() {
 		String mapSource = null;
 		try {
-	        URL mapUrl = new URL(mapString);
+	        URL mapUrl = new URL(this.mapString);
 	        HttpURLConnection conn = (HttpURLConnection) mapUrl.openConnection();
 	        conn.setReadTimeout(10000);
 	        conn.setConnectTimeout(15000);
@@ -45,7 +45,6 @@ public class Maps {
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }
-		
 		FeatureCollection fc = FeatureCollection.fromJson(mapSource);
         List<Feature> f = fc.features();
         return f;
