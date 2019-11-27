@@ -13,6 +13,8 @@ public abstract class Stateless implements Strategy{
 	
 	protected Drone drone;
 	protected List<Station> stations;
+	
+	//Memoryless fields
 	protected HashMap<Integer, Station> positive; 
 	protected HashMap<Integer, Station> neutral; 
 	protected HashMap<Integer, Station> negative; 
@@ -51,6 +53,7 @@ public abstract class Stateless implements Strategy{
 			String pre_longitude = Double.toString(this.drone.longitude);
 			String direction;
 			
+			//The fields of the stateless simulation are renewed after every move for it to be memoryless
 			this.positive.clear();
 			this.neutral.clear();
 			this.negative.clear();
