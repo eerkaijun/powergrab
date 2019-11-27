@@ -8,7 +8,8 @@ public class StatefulSim extends Stateful{
 		super(latitude, longitude);
 	}
 	
-	public double angleNearestPositive() {
+	//Determine the angle between the drone's current position and the nearest positive charging station
+	protected double angleNearestPositive() {
 		double [] distance_pos = new double[this.positive.size()];
 		for (int i=0; i<this.positive.size(); i++) {
 			Station s = this.positive.get(i);
@@ -37,7 +38,7 @@ public class StatefulSim extends Stateful{
 		return adjusted_angle;
 	}
 	
-	public void determineAvailableMoves() {
+	protected void determineAvailableMoves() {
 		for (int i=0; i<16; i++) {
 			//Test for valid directions within the next 16 possible moves
 			Drone drone_test = this.drone;
@@ -57,7 +58,8 @@ public class StatefulSim extends Stateful{
 		}
 	}
 	
-	public void determinePreferredDirection(double adjusted_angle) {
+	//Determine the two preferred directions to move towards the next nearest positive charging station
+	protected void determinePreferredDirection(double adjusted_angle) {
 		for (int i=1; i<17; i++) {
 			if (adjusted_angle - Direction.directions_angle[i] < 0) {
 				if (Math.abs(adjusted_angle - Direction.directions_angle[i]) < adjusted_angle - Direction.directions_angle[i-1]) {
@@ -74,9 +76,9 @@ public class StatefulSim extends Stateful{
 		if (this.second_preferred_direction == 16) this.second_preferred_direction = 0;
 	}
 	
-	public String meaningfulMoves(Random rnd) {
-		//Move towards the preferred directions if there are no negative charging stations
-		//Else choose a random direction that avoids negative charging stations
+	//Move towards the preferred directions if there are no negative charging stations
+	//Else choose a random direction that avoids negative charging stations
+	protected String meaningfulMoves(Random rnd) {
 		String direction;
 		int move;
 		if (this.preferred_directions.size() > 0) {
@@ -97,8 +99,8 @@ public class StatefulSim extends Stateful{
 		return direction;
 	}
 	
-	public String randomMoves(Random rnd) {
-		//Move towards a random direction that avoids negative charging stations
+	//Move towards a random direction that avoids negative charging stations
+	protected String randomMoves(Random rnd) {
 		String direction;
 		int move;
 		if (this.preferred_directions.size() > 0) {
@@ -113,7 +115,8 @@ public class StatefulSim extends Stateful{
 		return direction;
 	}
 	
-	public int connectToChargingStation(int count) {
+	//Update drone's fields when a charging station is within range
+	protected int connectToChargingStation(int count) {
 		count++;
 		double[] distance = new double[50];
 		for (int i=0; i<50; i++) {

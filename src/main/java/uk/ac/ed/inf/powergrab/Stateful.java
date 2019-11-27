@@ -60,6 +60,7 @@ public abstract class Stateful implements Strategy {
 		
 		while(this.drone.moves>0 && this.drone.power>0) {
 			
+			//After each move, the possible directions for the next move are reevaluated
 			this.valid_directions.clear();
 			this.preferred_directions.clear();
 			
@@ -71,24 +72,15 @@ public abstract class Stateful implements Strategy {
 			String direction;
 			
 			if (this.positive.size() != 0) {
-				
 				this.first_preferred_direction = -1;
 				this.second_preferred_direction = -1;
-				
 				double adjusted_angle = angleNearestPositive();
-
 				determineAvailableMoves();
-				
 				determinePreferredDirection(adjusted_angle);
-				
-				direction = meaningfulMoves(rnd);
-				
+				direction = meaningfulMoves(rnd); //Drone move towards the desired direction
 			} else {
-				
 				determineAvailableMoves();
-				
-				direction = randomMoves(rnd);
-				
+				direction = randomMoves(rnd); //Drone move towards a random direction avoiding negative charging stations
 			}
 			
 			count = connectToChargingStation(count);
@@ -137,7 +129,6 @@ public abstract class Stateful implements Strategy {
 		
 	}
 	
-	
 	abstract double angleNearestPositive();
 	
 	abstract void determineAvailableMoves();
@@ -149,6 +140,5 @@ public abstract class Stateful implements Strategy {
 	abstract String randomMoves(Random rnd);
 	
 	abstract int connectToChargingStation(int count);
-
 
 }
