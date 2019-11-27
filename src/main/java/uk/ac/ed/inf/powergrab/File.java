@@ -9,7 +9,6 @@ import com.mapbox.geojson.FeatureCollection;
 public class File {
 	
 	public static void writeTextFile(String filename, String content) {
-        
         try {
             FileWriter fileWriter = new FileWriter(filename, true);
             BufferedWriter bufWriter = new BufferedWriter(fileWriter);
@@ -20,18 +19,15 @@ public class File {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
 	}
 	
 	public static void writeGeoJSONFile(String filename, FeatureCollection fc) {
-		
 		try (FileWriter file = new FileWriter(filename)) {
             file.write(fc.toJson());
             file.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-		
 	}
 
 }
